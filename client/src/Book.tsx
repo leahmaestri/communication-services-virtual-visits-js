@@ -10,18 +10,12 @@ import { fetchConfig } from './utils/FetchConfig';
 import { AppConfigModel } from './models/ConfigModel';
 import { GenericError } from './components/GenericError';
 import { useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
-import { BOOKINGS_LINK_COOKIE } from './models/Cookies';
 
 const PARENT_ID = 'BookMeetingSection';
-const DUMMY_BOOKINGS_LINK = 'https://microsoftbookings.azurewebsites.net/?organization=healthcare&UICulture=en-US';
 
 export const Book = (): JSX.Element => {
-  const [cookies, setCookie, removeCookie] = useCookies([BOOKINGS_LINK_COOKIE]);
   const [config, setConfig] = useState<AppConfigModel | undefined>(undefined);
   const [error, setError] = useState<any | undefined>(undefined);
-
-  console.log(cookies);
 
   useEffect(() => {
     const fetchData = async (): Promise<void> => {
@@ -38,11 +32,36 @@ export const Book = (): JSX.Element => {
   }, []);
 
   if (config) {
-    const bookingsLink =
-      cookies.vvBookingsLink && cookies.vvBookingsLink.length > 0
-        ? cookies.vvBookingsLink
-        : config.microsoftBookingsUrl;
+    const bookingsLink = config.microsoftBookingsUrl;
     console.log(bookingsLink);
+
+    const onSetBookingsLink = async () => {
+      const response = await fetch('/api/config', {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        mode: 'cors',
+        method: 'POST'
+      });
+
+      const responseContent = await response.text();
+      const config = JSON.parse(responseContent);
+      setConfig(config);
+    };
+
+    const onUnsetBookingsLink = async () => {
+      const response = await fetch('/api/config/restore', {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        mode: 'cors',
+        method: 'POST'
+      });
+
+      const responseContent = await response.text();
+      const config = JSON.parse(responseContent);
+      setConfig(config);
+    };
 
     return (
       <ThemeProvider theme={config.theme} style={{ height: '100%' }}>
@@ -56,15 +75,10 @@ export const Book = (): JSX.Element => {
             }}
           >
             <Stack style={{ marginTop: '12px', width: '500px' }}>
-              <PrimaryButton
-                style={{ marginTop: '8px', marginBottom: '8px' }}
-                onClick={() => setCookie(BOOKINGS_LINK_COOKIE, DUMMY_BOOKINGS_LINK)}
-              >
-                Set Bookings Link cookie
+              <PrimaryButton style={{ marginTop: '8px', marginBottom: '8px' }} onClick={onSetBookingsLink}>
+                Set New Bookings Link In Cache
               </PrimaryButton>
-              <PrimaryButton onClick={() => removeCookie(BOOKINGS_LINK_COOKIE)}>
-                Unset Bookings Link cookie
-              </PrimaryButton>
+              <PrimaryButton onClick={onUnsetBookingsLink}>Restore Bookings Link</PrimaryButton>
             </Stack>
             <iframe src={bookingsLink} scrolling="yes" style={embededIframeStyles}></iframe>
           </LayerHost>

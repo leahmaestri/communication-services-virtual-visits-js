@@ -1,5 +1,5 @@
 {
-  "communicationServicesConnectionString": "endpoint=your_endpoint;accesskey=secret",
+  "communicationServicesConnectionString": "endpoint=https://rgabrinao-oct22-acs.communication.azure.com/;accesskey=SJnvJveBi+7MftQnBPLgtl2lLxqaFqczLqpL/vq3g7sU2vdCjaBy0hSISycis4JpmpDlmiI/qqRFcWo4RjL3HQ==",
   "microsoftBookingsUrl": "https://microsoftbookings.azurewebsites.net/?organization=financialservices&UICulture=en-US",
   "chatEnabled": true,
   "screenShareEnabled": true,
@@ -20,7 +20,7 @@
     }
   },
   "cosmosDb": {
-    "connectionString": "Connection string of your Cosmos DB account",
-    "dbName": "Name of the Cosmos Database"
+    "connectionString": "AccountEndpoint=https://rgabrinao-1024-cosmos.documents.azure.com:443/;AccountKey=zB96G7ZJVOl2wZvMJKlP1m3tKPSzuoyvta6ixLCbuUhuOEFTxxeaGV9kRPMt7LkbiSAEHnxLrJzNBZH7jIh6XA==;",
+    "dbName": "myDb"
   }
 }

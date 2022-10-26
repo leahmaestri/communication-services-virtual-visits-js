@@ -6,13 +6,15 @@ import path from 'path';
 import { CommunicationIdentityClient } from '@azure/communication-identity';
 import { getServerConfig } from './utils/getConfig';
 import { removeJsonpCallback } from './utils/removeJsonpCallback';
-import { configController } from './controllers/configController';
+import { configController, restoreConfig, updateConfig } from './controllers/configController';
 import { tokenController } from './controllers/tokenController';
 import { storeSurveyResult } from './controllers/surveyController';
 import { createSurveyDBHandler } from './databaseHandlers/surveyDBHandler';
 import { ERROR_PAYLOAD_500 } from './constants';
+import NodeCache from 'node-cache';
 
 const app = express();
+const cache = new NodeCache({ stdTTL: 0 });
 
 app.use(express.static('public'));
 app.disable('x-powered-by');
@@ -48,7 +50,9 @@ const identityClient =
     ? ({} as CommunicationIdentityClient)
     : new CommunicationIdentityClient(config.communicationServicesConnectionString);
 
-app.get('/api/config', configController(config));
+app.get('/api/config', configController(config, cache));
+app.post('/api/config', updateConfig(config, cache));
+app.post('/api/config/restore', restoreConfig(config, cache));
 app.get('/api/token', tokenController(identityClient, config));
 
 const surveyDBHandler = createSurveyDBHandler(config);
